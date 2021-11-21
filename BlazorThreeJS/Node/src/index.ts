@@ -9,15 +9,15 @@ let camera, renderer;
 const scene = new THREE.Scene()
 
 // Objects
-const geometry = new THREE.TorusGeometry(.7, .2, 16, 100);
+const atom = new THREE.SphereGeometry();
 
 // Materials
 const material = new THREE.MeshBasicMaterial()
 material.color = new THREE.Color(0xff0000)
 
-// Mesh
-const sphere = new THREE.Mesh(geometry, material)
-scene.add(sphere)
+//// Mesh
+//const sphere = new THREE.Mesh(geometry, material)
+/*scene.add(sphere)*/
 // Lights
 const pointLight = new THREE.PointLight(0xffffff, 0.1)
 pointLight.position.x = 2
@@ -31,8 +31,8 @@ const tick = () => {
 
     const elapsedTime = clock.getElapsedTime()
 
-    // Update objects
-    sphere.rotation.y = .5 * elapsedTime
+    //// Update objects
+    //sphere.rotation.y = .5 * elapsedTime
 
     // Update Orbital Controls
     // controls.update()
@@ -42,6 +42,10 @@ const tick = () => {
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)
+}
+
+export function test(data: any) {
+    console.log(data);
 }
 
 export function init(canvasSelector: string) {

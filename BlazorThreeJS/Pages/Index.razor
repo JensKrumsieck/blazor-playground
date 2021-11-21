@@ -8,12 +8,37 @@
 Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
+<InputFile OnChange="OnFileChange" id="filedrop" class="form-control" />
 <canvas id="three"/>
 <Button @onclick="Callback">LEL</Button>
 
+@if(molecule != null)
+{
+    @foreach(var atom in molecule.Atoms)
+    {
+        
+    }
+}
+
 @code{
+
+    Molecule molecule;
+
     private async Task Callback()
     {
         await JS.InvokeAsync<string>("JSLib.init", "three");
+    }
+
+    private async Task OnFileChange(InputFileChangeEventArgs args)
+    {
+        var file = args.File;
+        var extension = FileHandler.GetExtension(file.Name);
+        var provider = (AbstractAtomDataProvider) FormatterServices.GetSafeUninitializedObject(MoleculeFactory.DataProviderDictionary[extension]);
+        var stream = file.OpenReadStream(8192000L);
+        using var sr = new StreamReader(stream);
+        provider.Content = (await sr.ReadToEndAsync()).Split("\n");
+        provider.ReadData();
+        molecule = new Molecule(provider);
+        await JS.InvokeAsync<Molecule>("JSLib.test", molecule);
     }
 }
