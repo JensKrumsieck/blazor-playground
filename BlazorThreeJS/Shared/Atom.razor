@@ -1,0 +1,12 @@
+﻿@inject IJSRuntime JS
+<!---->
+@code {
+    [Parameter]
+    public ChemSharp.Molecules.Atom? Data { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Data == null) return;
+        await JS.InvokeVoidAsync("JSLib.addAtom", Data.Location.X, Data.Location.Y, Data.Location.Z, Data.CovalentRadius??100, Data.Color);
+    }
+}

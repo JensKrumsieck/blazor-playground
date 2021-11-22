@@ -1,0 +1,38 @@
+﻿@page "/molecule"
+@inject IJSRuntime JS
+
+<h3>Molecule</h3>
+<InputFile OnChange="OnFileChange" id="filedrop" class="form-control" />   
+
+@if(molecule != null)
+{
+    <ThreeCanvas>
+        @foreach(var bond in molecule.Bonds)
+        {
+            <Bond Data=bond/>
+        }
+        @foreach(var atom in molecule.Atoms)
+        {
+            <Atom Data=atom/>
+        }
+    </ThreeCanvas>
+}
+
+@code {
+
+    ChemSharp.Molecules.Molecule? molecule;
+
+    private async Task OnFileChange(InputFileChangeEventArgs args)
+    {
+        molecule = null;
+        await JS.InvokeVoidAsync("JSLib.clearCanvas");
+        var file = args.File;
+        var extension = FileHandler.GetExtension(file.Name);
+        var provider = (AbstractAtomDataProvider) FormatterServices.GetSafeUninitializedObject(MoleculeFactory.DataProviderDictionary[extension]);
+        var stream = file.OpenReadStream(8192000L);
+        using var sr = new StreamReader(stream);
+        provider.Content = (await sr.ReadToEndAsync()).Split("\n");
+        provider.ReadData();
+        molecule = new ChemSharp.Molecules.Molecule(provider);
+    }
+}

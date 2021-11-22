@@ -9,7 +9,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, '../wwwroot/js'),
         filename: 'index.bundle.js',
-        library: "JSLib"
+        library: 'JSLib'
     },
     module: {
         rules: [
