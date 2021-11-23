@@ -11,6 +11,12 @@ module.exports = {
         filename: 'index.bundle.js',
         library: 'JSLib'
     },
+    resolve: {
+        alias: {
+            components: path.resolve(__dirname, 'src/'),
+        },
+        extensions: ['.ts', '.js'],
+    },
     module: {
         rules: [
             { test: /\.js$/, use: 'babel-loader', exclude: /node_modules/ },
