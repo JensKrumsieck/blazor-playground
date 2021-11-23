@@ -58,8 +58,7 @@ export function addAtom(x: number, y: number, z: number, radius: number, color: 
 
 export function addBond(x: number, y: number, z: number, qx: number, qy: number, qz: number, qw: number, length: number) {
     const material = new THREE.MeshBasicMaterial({
-        color: new THREE.Color("#999"),
-        depthWrite: false
+        color: new THREE.Color("#999")
     });
     var bond = new THREE.CylinderGeometry(.1, .1, length);
     let cylinder = new THREE.Mesh(bond, material);
@@ -81,7 +80,7 @@ function addCamera() {
         width: canvas.clientWidth,
         height: canvas.clientHeight
     }
-    camera = new THREE.OrthographicCamera(sizes.width / -2, sizes.width / 2, sizes.height / -2, sizes.height / 2, -100, 1000);
+    camera = new THREE.OrthographicCamera(sizes.width / -2, sizes.width / 2, sizes.height / 2, sizes.height / -2, -100, 1000);
     camera.zoom = 15;
     camera.position.set(0, 0, -5)
     updateCamera(sizes)
