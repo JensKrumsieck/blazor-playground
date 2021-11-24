@@ -17,6 +17,6 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
-        await JS.InvokeVoidAsync("chemsharpMolecules.init", "three-webgl");
+        await JS.InitThreeJSAsync();
     }
 }
