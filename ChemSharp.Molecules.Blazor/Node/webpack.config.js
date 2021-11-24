@@ -7,9 +7,9 @@ module.exports = {
         entry: './src/index.ts'
     },
     output: {
-        path: path.resolve(__dirname, '../wwwroot/js'),
-        filename: 'index.bundle.js',
-        library: 'JSLib'
+        path: path.resolve(__dirname, '../wwwroot/'),
+        filename: 'chemsharp.bundle.js',
+        library: 'chemsharpMolecules'
     },
     resolve: {
         alias: {

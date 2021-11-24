@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+	 <PackageReference Include="Microsoft.AspNetCore.Components" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+	<Target Name="NodeBuild" BeforeTargets="Build">
+		<Exec Command="node --version" ContinueOnError="true" />
+		<Exec Command="npm install" WorkingDirectory="Node" />
+		<Exec Command="npm run build" WorkingDirectory="Node" />
+	</Target>
+
+</Project>

@@ -7,6 +7,6 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (Data == null) return;
-        await JS.InvokeVoidAsync("JSLib.addAtom",Data.Title, Data.Symbol, Data.Location.X, Data.Location.Y, Data.Location.Z, Data.CovalentRadius??100, Data.Color);
+        await JS.InvokeVoidAsync("chemsharpMolecules.addAtom",Data.Title, Data.Symbol, Data.Location.X, Data.Location.Y, Data.Location.Z, Data.CovalentRadius??100, Data.Color);
     }
 }

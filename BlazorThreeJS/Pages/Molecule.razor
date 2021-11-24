@@ -25,7 +25,7 @@
     private async Task OnFileChange(InputFileChangeEventArgs args)
     {
         molecule = null;
-        await JS.InvokeVoidAsync("JSLib.clearCanvas");
+        await JS.InvokeVoidAsync("chemsharpMolecules.clearCanvas");
         var file = args.File;
         var extension = FileHandler.GetExtension(file.Name);
         var provider = (AbstractAtomDataProvider) FormatterServices.GetSafeUninitializedObject(MoleculeFactory.DataProviderDictionary[extension]);

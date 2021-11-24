@@ -6,16 +6,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 	  <LangVersion>10</LangVersion>
-	  <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <RunAOTCompilation>True</RunAOTCompilation>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="Node\src\util.ts" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ChemSharp.Molecules" Version="1.0.10" />
@@ -24,13 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Include="Node\src\util.ts" />
+    <ProjectReference Include="..\ChemSharp.Molecules.Blazor\ChemSharp.Molecules.Blazor.csproj" />
   </ItemGroup>
-
-	<Target Name="NodeBuild" BeforeTargets="Build">
-		<Exec Command="node --version" ContinueOnError="true" />
-		<Exec Command="npm install" WorkingDirectory="Node" />
-		<Exec Command="npm run build" WorkingDirectory="Node" />
-	</Target>
-
 </Project>
