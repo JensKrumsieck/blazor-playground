@@ -4,20 +4,7 @@
 
 <h3>Molecule</h3>
 <InputFile OnChange="OnFileChange" id="filedrop" class="form-control" />   
-
-@if(molecule != null)
-{
-    <ThreeCanvas>
-        @foreach(var bond in molecule.Bonds)
-        {
-            <BlazorBond Data=bond/>
-        }
-        @foreach(var atom in molecule.Atoms)
-        {
-            <BlazorAtom Data=atom/>
-        }
-    </ThreeCanvas>
-}
+<BlazorMolecule Molecule=molecule />
 
 @code {
 
@@ -25,8 +12,6 @@
 
     private async Task OnFileChange(InputFileChangeEventArgs args)
     {
-        molecule = null;
-        await JS.ClearCanvas();
         var file = args.File;
         molecule = await BlazorMoleculeFactory.CreateAsync(file);
     }
