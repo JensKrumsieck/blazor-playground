@@ -1,6 +1,6 @@
 # blazor-playground
 Demo:
-https://blazor-playground.vercel.app/plot
+https://blazor-playground.vercel.app
 
 ## Feature: OxyPlot Blazor with SkiaSharp
 * Show Plot
