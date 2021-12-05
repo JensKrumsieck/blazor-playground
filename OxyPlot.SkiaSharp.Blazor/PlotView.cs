@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using SkiaSharp;
 using SkiaSharp.Views.Blazor;
 using System.Numerics;
@@ -185,26 +186,26 @@ public class PlotView : ComponentBase, IPlotView
         builder.OpenComponent<SKCanvasView>(0);
         builder.AddAttribute(1, "OnPaintSurface", OnPaintSurface);
         builder.AddAttribute(2, "width", Width);
-        builder.AddAttribute(3, "height", Height);
-        AddEventCallback<MouseEventArgs>(builder, 4, "onmousedown", e => ActualController.HandleMouseDown(this, e.OxyMouseEventArgs()));
-        AddEventCallback<MouseEventArgs>(builder, 4, "onmousemove", e => ActualController.HandleMouseMove(this, e.OxyMouseEventArgs()));
-        AddEventCallback<MouseEventArgs>(builder, 4, "onmouseup", e => ActualController.HandleMouseUp(this, e.OxyMouseEventArgs()));
-        AddEventCallback<MouseEventArgs>(builder, 4, "onmousein", e => ActualController.HandleMouseEnter(this, e.OxyMouseEventArgs()));
-        AddEventCallback<MouseEventArgs>(builder, 4, "onmouseout", e => ActualController.HandleMouseLeave(this, e.OxyMouseEventArgs()));
+        builder.AddAttribute(2, "height", Height);
+        builder.AddAttribute(2, "style", $"width: {Width}px; height: {Height}px");
+        AddEventCallback<MouseEventArgs>(builder, 3, "onmousedown", e => ActualController.HandleMouseDown(this, e.OxyMouseEventArgs()));
+        AddEventCallback<MouseEventArgs>(builder, 3, "onmousemove", e => ActualController.HandleMouseMove(this, e.OxyMouseEventArgs()));
+        AddEventCallback<MouseEventArgs>(builder, 3, "onmouseup", e => ActualController.HandleMouseUp(this, e.OxyMouseEventArgs()));
+        AddEventCallback<MouseEventArgs>(builder, 3, "onmousein", e => ActualController.HandleMouseEnter(this, e.OxyMouseEventArgs()));
+        AddEventCallback<MouseEventArgs>(builder, 3, "onmouseout", e => ActualController.HandleMouseLeave(this, e.OxyMouseEventArgs()));
 
-        builder.AddAttribute(6, "onmousewheel", EventCallback.Factory.Create<WheelEventArgs>(this, e => ActualController.HandleMouseWheel(this, e.OxyMouseWheelEventArgs())));
+        builder.AddAttribute(4, "onmousewheel", EventCallback.Factory.Create<WheelEventArgs>(this, e => ActualController.HandleMouseWheel(this, e.OxyMouseWheelEventArgs())));
         //builder.AddEventPreventDefaultAttribute(6, "onmousewheel", true);
-        builder.AddEventStopPropagationAttribute(6, "onmousewheel", true);
+        builder.AddEventStopPropagationAttribute(4, "onmousewheel", true);
 
-        builder.AddEventPreventDefaultAttribute(7, "oncontextmenu", true);
-        builder.AddEventStopPropagationAttribute(7, "oncontextmenu", true);
-        builder.AddMultipleAttributes(8, UnmatchedParameters);
+        builder.AddEventPreventDefaultAttribute(4, "oncontextmenu", true);
+        builder.AddEventStopPropagationAttribute(4, "oncontextmenu", true);
+        builder.AddMultipleAttributes(5, UnmatchedParameters);
 
-        builder.AddComponentReferenceCapture(9, reference =>
+        builder.AddComponentReferenceCapture(6, reference =>
         {
             _canvasView = (SKCanvasView)reference;
         });
-
         builder.CloseComponent();
     }   
     #endregion
