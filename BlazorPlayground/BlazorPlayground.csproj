@@ -2,16 +2,11 @@
 <Import Project="..\OxyPlot.SkiaSharp.Blazor\build\net6.0\OxyPlot.SkiaSharp.Blazor.props" />
   <PropertyGroup>
 	  <PackageId>BlazorPlayground</PackageId>
-    <TargetFramework>net6.0</TargetFramework>
+       <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 	  <LangVersion>10</LangVersion>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <RunAOTCompilation>True</RunAOTCompilation>
-  </PropertyGroup>
-	
   <ItemGroup>
     <PackageReference Include="ChemSharp.Molecules.Blazor" Version="1.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.0" />
