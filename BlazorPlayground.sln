@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorPlayground", "BlazorPlayground\BlazorPlayground.csproj", "{C2311870-3ACA-40A7-B412-102CD6C6962A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OxyPlot.SkiaSharp.Blazor", "OxyPlot.SkiaSharp.Blazor\OxyPlot.SkiaSharp.Blazor.csproj", "{3289DE41-8A9A-4739-8218-E1ACB150369C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{C2311870-3ACA-40A7-B412-102CD6C6962A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2311870-3ACA-40A7-B412-102CD6C6962A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2311870-3ACA-40A7-B412-102CD6C6962A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3289DE41-8A9A-4739-8218-E1ACB150369C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3289DE41-8A9A-4739-8218-E1ACB150369C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3289DE41-8A9A-4739-8218-E1ACB150369C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3289DE41-8A9A-4739-8218-E1ACB150369C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

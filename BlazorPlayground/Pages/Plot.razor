@@ -1,0 +1,26 @@
+﻿@page "/plot"
+@using OxyPlot
+@using OxyPlot.Series
+@using OxyPlot.SkiaSharp.Blazor
+
+<PlotView Model=model Width=500 Height=200/>
+@code {
+    private PlotModel model = new PlotModel();
+
+    protected override void OnInitialized()
+    {
+        var pts = new DataPoint[]
+        {
+            new(1, 2),
+            new(2, 4),
+            new(9, 0),
+            new(12, 5),
+            new(10, 11),
+        };
+        var series = new LineSeries()
+        {
+                ItemsSource = pts
+        };
+        model.Series.Add(series);
+    }
+}
