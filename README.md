@@ -1,6 +1,6 @@
 # blazor-playground
 
-##Feature: OxyPlot Blazor with SkiaSharp
+## Feature: OxyPlot Blazor with SkiaSharp
 * Show Plot
 <img src="https://github.com/JensKrumsieck/blazor-threejs/raw/master/.github/screenshot_2.png" alt="Screenshot" width="600" />
 
