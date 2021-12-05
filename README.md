@@ -2,6 +2,7 @@
 
 ## Feature: OxyPlot Blazor with SkiaSharp
 * Show Plot
+* Started implementing basic plot interaction
 <img src="https://github.com/JensKrumsieck/blazor-threejs/raw/master/.github/screenshot_2.png" alt="Screenshot" width="600" />
 
 ## Feature: ChemSharp.Molecules.Blazor (moved into [ChemSharp](https://github.com/JensKrumsieck/ChemSharp))
