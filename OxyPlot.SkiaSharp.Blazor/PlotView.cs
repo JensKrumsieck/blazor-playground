@@ -1,17 +1,19 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.AspNetCore.Components.Web;
 using SkiaSharp;
 using SkiaSharp.Views.Blazor;
 using System.Numerics;
 
 namespace OxyPlot.SkiaSharp.Blazor;
-public partial class PlotView : ComponentBase, IPlotView
+public class PlotView : ComponentBase, IPlotView
 {
     private PlotModel _model;
     private readonly object modelLock = new object();
     private IPlotController _defaultController;
     protected IRenderContext _renderContext;
     private SKRenderContext SKRenderContext => (SKRenderContext)_renderContext;
+    private SKCanvasView _canvasView;
 
     #region Parameters
     [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> UnmatchedParameters { get; set; }
@@ -109,6 +111,13 @@ public partial class PlotView : ComponentBase, IPlotView
         InvalidatePlot();
     }
 
+    private void AddEventCallback<T>(RenderTreeBuilder builder, int seq, string name, Action<T> callback)
+    {
+        builder.AddEventPreventDefaultAttribute(seq, name, true);
+        builder.AddEventPreventDefaultAttribute(seq, name, true);
+        builder.AddAttribute(seq, name, EventCallback.Factory.Create(this, callback));
+    }
+
     #region Rendering
     /// <inheritdoc/>
     protected static IRenderContext CreateRenderContext() => new SKRenderContext();
@@ -116,9 +125,7 @@ public partial class PlotView : ComponentBase, IPlotView
     /// <inheritdoc/>
     public void InvalidatePlot(bool updateData = true)
     {
-
         if (ActualModel == null) return;
-
         lock (ActualModel.SyncRoot) ((IPlotModel)ActualModel).Update(updateData);
         Render();
     }
@@ -128,7 +135,7 @@ public partial class PlotView : ComponentBase, IPlotView
     protected void Render()
     {
         if (_renderContext == null) return;
-        RenderOverride();
+        _canvasView.Invalidate();
     }
 
     /// <summary>
@@ -138,9 +145,9 @@ public partial class PlotView : ComponentBase, IPlotView
     {
         ClearBackground();
         if (ActualModel == null) return;
-        // round width and height to full device pixels
-        //var width = ((int)(this.plotPresenter.ActualWidth * dpiScale)) / dpiScale;
-        //var height = ((int)(this.plotPresenter.ActualHeight * dpiScale)) / dpiScale;
+        //// round width and height to full device pixels
+        ////var width = ((int)(this.plotPresenter.ActualWidth * dpiScale)) / dpiScale;
+        ////var height = ((int)(this.plotPresenter.ActualHeight * dpiScale)) / dpiScale;
         lock (ActualModel.SyncRoot) ((IPlotModel)ActualModel).Render(_renderContext, ClientArea);
     }
     protected void ClearBackground()
@@ -159,6 +166,7 @@ public partial class PlotView : ComponentBase, IPlotView
     {
         SKRenderContext.SkCanvas = e.Surface.Canvas;
         RenderOverride();
+        SKRenderContext.SkCanvas = null!;
     }
     #endregion
     #region Razor Component Methods
@@ -178,8 +186,26 @@ public partial class PlotView : ComponentBase, IPlotView
         builder.AddAttribute(1, "OnPaintSurface", OnPaintSurface);
         builder.AddAttribute(2, "width", Width);
         builder.AddAttribute(3, "height", Height);
-        builder.AddMultipleAttributes(4, UnmatchedParameters);
+        AddEventCallback<MouseEventArgs>(builder, 4, "onmousedown", e => ActualController.HandleMouseDown(this, e.OxyMouseEventArgs()));
+        AddEventCallback<MouseEventArgs>(builder, 4, "onmousemove", e => ActualController.HandleMouseMove(this, e.OxyMouseEventArgs()));
+        AddEventCallback<MouseEventArgs>(builder, 4, "onmouseup", e => ActualController.HandleMouseUp(this, e.OxyMouseEventArgs()));
+        AddEventCallback<MouseEventArgs>(builder, 4, "onmousein", e => ActualController.HandleMouseEnter(this, e.OxyMouseEventArgs()));
+        AddEventCallback<MouseEventArgs>(builder, 4, "onmouseout", e => ActualController.HandleMouseLeave(this, e.OxyMouseEventArgs()));
+
+        builder.AddAttribute(6, "onmousewheel", EventCallback.Factory.Create<WheelEventArgs>(this, e => ActualController.HandleMouseWheel(this, e.OxyMouseWheelEventArgs())));
+        //builder.AddEventPreventDefaultAttribute(6, "onmousewheel", true);
+        builder.AddEventStopPropagationAttribute(6, "onmousewheel", true);
+
+        builder.AddEventPreventDefaultAttribute(7, "oncontextmenu", true);
+        builder.AddEventStopPropagationAttribute(7, "oncontextmenu", true);
+        builder.AddMultipleAttributes(8, UnmatchedParameters);
+
+        builder.AddComponentReferenceCapture(9, reference =>
+        {
+            _canvasView = (SKCanvasView)reference;
+        });
+
         builder.CloseComponent();
-    }
+    }   
     #endregion
 }
