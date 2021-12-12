@@ -187,7 +187,8 @@ public class PlotView : ComponentBase, IPlotView
         builder.AddAttribute(1, "OnPaintSurface", OnPaintSurface);
         builder.AddAttribute(2, "width", Width);
         builder.AddAttribute(2, "height", Height);
-        builder.AddAttribute(2, "style", $"width: {Width}px; height: {Height}px");
+        builder.AddAttribute(2, "IgnorePixelScaling", true); 
+        //builder.AddAttribute(2, "style", $"width: {Width}px; height: {Height}px");
         AddEventCallback<MouseEventArgs>(builder, 3, "onmousedown", e => ActualController.HandleMouseDown(this, e.OxyMouseEventArgs()));
         AddEventCallback<MouseEventArgs>(builder, 3, "onmousemove", e => ActualController.HandleMouseMove(this, e.OxyMouseEventArgs()));
         AddEventCallback<MouseEventArgs>(builder, 3, "onmouseup", e => ActualController.HandleMouseUp(this, e.OxyMouseEventArgs()));
