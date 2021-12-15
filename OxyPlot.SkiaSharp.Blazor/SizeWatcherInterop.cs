@@ -26,7 +26,8 @@ namespace OxyPlot.SkiaSharp.Blazor
             callbackHelper = new FloatFloatActionHelper((x, y) => callback(new SKSize(x, y)));
         }
 
-        public void Start() {
+        public void Start()
+        {
             if (callbackReference != null)
                 return;
 
@@ -35,7 +36,8 @@ namespace OxyPlot.SkiaSharp.Blazor
             Invoke("SizeWatcher.observe", _htmlElement, _htmlElementId, callbackReference);
         }
 
-        public void Stop() {
+        public void Stop()
+        {
             if (callbackReference == null)
                 return;
 
