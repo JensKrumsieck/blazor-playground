@@ -15,12 +15,13 @@ public class PlotView : ComponentBase, IPlotView
     protected IRenderContext _renderContext;
     private SKRenderContext SKRenderContext => (SKRenderContext)_renderContext;
     private SKCanvasView _canvasView;
+    private ElementReference _wrapper;
+    private SKSize _canvasSize;
+    private SizeWatcherInterop sizeWatcher = null!;
 
     #region Parameters
     [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> UnmatchedParameters { get; set; }
     [Parameter] public IPlotController Controller { get; set; }
-    [Parameter] public double Width { get; set; }
-    [Parameter] public double Height { get; set; }
     [Parameter]
     public PlotModel Model
     {
@@ -31,6 +32,9 @@ public class PlotView : ComponentBase, IPlotView
             OnModelChanged();
         }
     }
+
+    [Inject]
+    IJSRuntime JS { get; set; } = null!;
     #endregion
 
     /// <summary>
@@ -47,7 +51,7 @@ public class PlotView : ComponentBase, IPlotView
     /// <inheritdoc/>
     IController IView.ActualController => ActualController;
 
-    public OxyRect ClientArea => new(0, 0, Width, Height);
+    public OxyRect ClientArea => new(0, 0, _canvasSize.Width, _canvasSize.Height);
     /// <inheritdoc/>
     public void HideTracker() { }
     /// <inheritdoc/>
@@ -146,16 +150,15 @@ public class PlotView : ComponentBase, IPlotView
     {
         ClearBackground();
         if (ActualModel == null) return;
-        //// round width and height to full device pixels
-        ////var width = ((int)(this.plotPresenter.ActualWidth * dpiScale)) / dpiScale;
-        ////var height = ((int)(this.plotPresenter.ActualHeight * dpiScale)) / dpiScale;
-        lock (ActualModel.SyncRoot) ((IPlotModel)ActualModel).Render(_renderContext, ClientArea);
+        var dpiFi = typeof(SKCanvasView).GetField("dpi", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        var dpi = (double)dpiFi.GetValue(_canvasView);
+        lock (ActualModel.SyncRoot) ((IPlotModel)ActualModel).Render(_renderContext, new OxyRect(0, 0, (int)(_canvasSize.Width * dpi), (int)(_canvasSize.Height * dpi)));
     }
     protected void ClearBackground()
     {
         var color = ActualModel?.Background.IsVisible() == true
-            ? ActualModel.Background.ToSKColor()
-            : SKColors.Empty;
+                    ? ActualModel.Background.ToSKColor()
+                    : SKColors.Empty;
 
         SKRenderContext.SkCanvas.Clear(color);
     }
@@ -177,17 +180,26 @@ public class PlotView : ComponentBase, IPlotView
         _renderContext = CreateRenderContext();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        sizeWatcher = await SizeWatcherInterop.ImportAsync(JS, _wrapper, OnSizeChanged);
+    }
+
+    private void OnSizeChanged(SKSize size) => _canvasSize = size;
+
     /// <summary>
     /// Adds SKCanvasElement to RenderTree
     /// </summary>
     /// <param name="builder"></param>
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
-        builder.OpenComponent<SKCanvasView>(0);
-        builder.AddAttribute(1, "OnPaintSurface", OnPaintSurface);
-        builder.AddAttribute(2, "width", Width);
-        builder.AddAttribute(2, "height", Height);
-        //builder.AddAttribute(2, "style", $"width: {Width}px; height: {Height}px");
+        builder.OpenElement(0, "div");
+        builder.AddMultipleAttributes(1, UnmatchedParameters);
+        builder.OpenComponent<SKCanvasView>(1);
+        builder.AddAttribute(2, "OnPaintSurface", OnPaintSurface);
+        builder.AddAttribute(2, "style", "width: 100%; height: inherit;");
+
         AddEventCallback<MouseEventArgs>(builder, 3, "onmousedown", e => ActualController.HandleMouseDown(this, e.OxyMouseEventArgs()));
         AddEventCallback<MouseEventArgs>(builder, 3, "onmousemove", e => ActualController.HandleMouseMove(this, e.OxyMouseEventArgs()));
         AddEventCallback<MouseEventArgs>(builder, 3, "onmouseup", e => ActualController.HandleMouseUp(this, e.OxyMouseEventArgs()));
@@ -200,13 +212,11 @@ public class PlotView : ComponentBase, IPlotView
 
         builder.AddEventPreventDefaultAttribute(4, "oncontextmenu", true);
         builder.AddEventStopPropagationAttribute(4, "oncontextmenu", true);
-        builder.AddMultipleAttributes(5, UnmatchedParameters);
 
-        builder.AddComponentReferenceCapture(6, reference =>
-        {
-            _canvasView = (SKCanvasView)reference;
-        });
+        builder.AddComponentReferenceCapture(6, reference => _canvasView = (SKCanvasView)reference);
         builder.CloseComponent();
-    }   
+        builder.AddElementReferenceCapture(6, reference => _wrapper = reference);
+        builder.CloseElement();
+    }
     #endregion
 }
