@@ -3,9 +3,9 @@
 @using OxyPlot.Series
 @using OxyPlot.SkiaSharp.Blazor
 @using SkiaSharp.Views.Blazor
+@inject HttpClient http;
 <h3>OxyPlot Test</h3>
 <PlotView Model=model style="height: 30vh"/>
-
 <br/>
 <h4>Missing Stuff</h4>
 <ul>
@@ -14,26 +14,35 @@
     <li><span style="text-decoration: line-through">Plot does weird stuff if monitor scaling is not set to 100%</span>, see <a href="https://github.com/mono/SkiaSharp/pull/1889">mono/SkiaSharp#1889</a> and <a href="https://github.com/mono/SkiaSharp/issues/1838">mono/SkiaSharp#1838</a></li>
     <li>...</li>
 </ul>
-
+<br/>
 @code {
     private PlotModel model = new PlotModel();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        var pts = new DataPoint[]
+        var data = await GenerateData();
+        var spc = new LineSeries()
         {
-            new(1, 2),
-            new(2, 4),
-            new(9, 0),
-            new(12, 5),
-            new(10, 11),
-        };
-        var series = new LineSeries()
-            {
-                ItemsSource = pts,
-                Title = "Look mom, OxyPlot.SkiaSharp.Blazor!",
+                ItemsSource = data,                
+                Title = "UV/Vis Data",
                 TrackerFormatString = "{0}<br/>{1}: {2:0.00} - {3}: {4:0.00}"
         };
-        model.Series.Add(series);
+        model.Series.Add(spc);
+    }
+
+    internal async Task<DataPoint[]> GenerateData()
+    {
+        var bytes = await http.GetByteArrayAsync("https://raw.githubusercontent.com/JensKrumsieck/ChemSharp/master/ChemSharp.Tests/files/uvvis.dsw");
+        var byteOffset = 0x459;
+        var cutOffLength = BitConverter.ToInt32(bytes, 0x6d) * 8;
+        bytes = new ArraySegment<byte>(bytes, byteOffset,
+                        cutOffLength != 0 ? cutOffLength : bytes.Length - byteOffset).ToArray();
+        var data = new float[bytes!.Length / sizeof(float)];
+        Buffer.BlockCopy(bytes, 0, data, 0, bytes.Length);
+        var points = new List<DataPoint>();
+        for (var i = 0; i < data.Length; i += 2) {
+            points.Add(new DataPoint(data[i], data[i + 1]));
+        }
+        return points.ToArray();
     }
 }
