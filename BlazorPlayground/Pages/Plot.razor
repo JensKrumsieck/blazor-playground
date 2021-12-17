@@ -4,13 +4,13 @@
 @using OxyPlot.SkiaSharp.Blazor
 @using SkiaSharp.Views.Blazor
 <h3>OxyPlot Test</h3>
-<PlotView Model=model style="width: 100%; height: 35vh;"/>
+<PlotView Model=model style="height: 30vh"/>
 
 <br/>
 <h4>Missing Stuff</h4>
 <ul>
     <li>Zoom Rectangle</li>
-    <li>Tracker</li>
+    <li><span style="text-decoration: line-through">Tracker</span></li>
     <li><span style="text-decoration: line-through">Plot does weird stuff if monitor scaling is not set to 100%</span>, see <a href="https://github.com/mono/SkiaSharp/pull/1889">mono/SkiaSharp#1889</a> and <a href="https://github.com/mono/SkiaSharp/issues/1838">mono/SkiaSharp#1838</a></li>
     <li>...</li>
 </ul>
@@ -29,8 +29,10 @@
             new(10, 11),
         };
         var series = new LineSeries()
-        {
-                ItemsSource = pts
+            {
+                ItemsSource = pts,
+                Title = "Look mom, OxyPlot.SkiaSharp.Blazor!",
+                TrackerFormatString = "{0}<br/>{1}: {2:0.00} - {3}: {4:0.00}"
         };
         model.Series.Add(series);
     }
