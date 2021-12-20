@@ -18,7 +18,8 @@ public class PlotView : ComponentBase, IPlotView
     private ElementReference _wrapper;
     private SKSize _canvasSize;
     private SizeWatcherInterop sizeWatcher = null!;
-    private TrackerHitResult _lastTrackerHitResult;
+    private TrackerHitResult _lastTrackerHitResult; 
+    private OxyRect zoomRectangle;
 
     #region Parameters
     [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> UnmatchedParameters { get; set; }
@@ -60,7 +61,10 @@ public class PlotView : ComponentBase, IPlotView
         StateHasChanged();
     }
     /// <inheritdoc/>
-    public void HideZoomRectangle() { }
+    public void HideZoomRectangle() {
+        zoomRectangle = new OxyRect(0, 0, 0, 0);
+        StateHasChanged();
+    }
     /// <inheritdoc/>
     public void ShowTracker(TrackerHitResult trackerHitResult)
     {
@@ -73,7 +77,10 @@ public class PlotView : ComponentBase, IPlotView
         StateHasChanged();
     }
     /// <inheritdoc/>
-    public void ShowZoomRectangle(OxyRect rectangle) { }
+    public void ShowZoomRectangle(OxyRect rectangle) {
+        zoomRectangle = rectangle;
+        StateHasChanged();
+    }
 
     /// <inheritdoc/>
     public void SetClipboardText(string text) { }
@@ -246,9 +253,16 @@ public class PlotView : ComponentBase, IPlotView
         if (_lastTrackerHitResult != null)
         {
             builder.OpenElement(7, "div");
-            builder.AddAttribute(7, "class", "oxytracker");
-            builder.AddAttribute(7, "style", $"position: absolute; left: {(int)_lastTrackerHitResult.Position.X}px; top: {(int)_lastTrackerHitResult.Position.Y}px");
+            builder.AddAttribute(7, "class", "oxyTracker");
+            builder.AddAttribute(7, "style", $"position: absolute; left: {(int)_lastTrackerHitResult.Position.X}px; top: {(int)_lastTrackerHitResult.Position.Y}px; pointer-events: none; font-family: {Model.DefaultFont}; font-size: {Model.DefaultFontSize}px;");
             builder.AddContent(8, (MarkupString)_lastTrackerHitResult.Text);
+            builder.CloseElement();
+        }
+        if(zoomRectangle.Width > 0 && zoomRectangle.Height > 0)
+        {
+            builder.OpenElement(9, "div");
+            builder.AddAttribute(9, "class", "oxyZoomRectangle");
+            builder.AddAttribute(7, "style", $"position: absolute; left: {zoomRectangle.Left}px; top: {zoomRectangle.Top}px; width: {zoomRectangle.Width}px; height: {zoomRectangle.Height}px; border: 1px solid #f0f0f0; background: rgba(0,255,0,.1); pointer-events: none;");
             builder.CloseElement();
         }
 
