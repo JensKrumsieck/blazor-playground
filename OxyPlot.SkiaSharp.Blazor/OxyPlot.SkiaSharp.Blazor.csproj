@@ -15,9 +15,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.1" />
     <PackageReference Include="OxyPlot.Core" Version="2.1.0" />
-    <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.0-preview.178" />
-    <PackageReference Include="SkiaSharp.Views.Blazor" Version="2.88.0-preview.178" />
-	<PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly" Version="2.8.2-preview.178" />
+    <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.0-preview.179" />
+    <PackageReference Include="SkiaSharp.Views.Blazor" Version="2.88.0-preview.179" />
+	<PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly" Version="2.8.2-preview.179" />
   </ItemGroup>
 
    <ItemGroup>
