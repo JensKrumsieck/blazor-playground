@@ -4,6 +4,7 @@ using SkiaSharp;
 using SkiaSharp.Views.Blazor.Internal;
 
 //mainly based on https://github.com/mono/SkiaSharp/tree/main/source/SkiaSharp.Views.Blazor/SkiaSharp.Views.Blazor/Internal as this class is marked internal.
+//see https://github.com/mono/SkiaSharp/pull/1912 - provides better solution, no need to use Watcher
 
 namespace OxyPlot.SkiaSharp.Blazor
 {
