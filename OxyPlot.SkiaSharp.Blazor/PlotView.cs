@@ -1,24 +1,22 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Numerics;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using SkiaSharp;
 using SkiaSharp.Views.Blazor;
-using System.Numerics;
 
 namespace OxyPlot.SkiaSharp.Blazor;
 public class PlotView : ComponentBase, IPlotView
 {
     private PlotModel _model;
-    private readonly object modelLock = new object();
+    private readonly object modelLock = new();
     private IPlotController _defaultController;
     protected IRenderContext _renderContext;
-    private SKRenderContext SKRenderContext => (SKRenderContext)_renderContext;
+    private SkiaRenderContext SKRenderContext => (SkiaRenderContext)_renderContext;
     private SKCanvasView _canvasView;
-    private ElementReference _wrapper;
     private SKSize _canvasSize;
-    private SizeWatcherInterop sizeWatcher = null!;
-    private TrackerHitResult _lastTrackerHitResult; 
+    private TrackerHitResult _lastTrackerHitResult;
     private OxyRect zoomRectangle;
 
     #region Parameters
@@ -61,7 +59,8 @@ public class PlotView : ComponentBase, IPlotView
         StateHasChanged();
     }
     /// <inheritdoc/>
-    public void HideZoomRectangle() {
+    public void HideZoomRectangle()
+    {
         zoomRectangle = new OxyRect(0, 0, 0, 0);
         StateHasChanged();
     }
@@ -77,7 +76,8 @@ public class PlotView : ComponentBase, IPlotView
         StateHasChanged();
     }
     /// <inheritdoc/>
-    public void ShowZoomRectangle(OxyRect rectangle) {
+    public void ShowZoomRectangle(OxyRect rectangle)
+    {
         zoomRectangle = rectangle;
         StateHasChanged();
     }
@@ -125,7 +125,7 @@ public class PlotView : ComponentBase, IPlotView
             if (ActualModel != null)
             {
                 ((IPlotModel)ActualModel).AttachPlotView(null);
-                ActualModel = null;
+                ActualModel = null!;
             }
 
             if (Model != null)
@@ -145,8 +145,6 @@ public class PlotView : ComponentBase, IPlotView
     }
 
     #region Rendering
-    /// <inheritdoc/>
-    protected static IRenderContext CreateRenderContext() => new SKRenderContext();
 
     /// <inheritdoc/>
     public void InvalidatePlot(bool updateData = true)
@@ -176,9 +174,11 @@ public class PlotView : ComponentBase, IPlotView
 
     private OxyRect CalculateBounds()
     {
-        //TODO: Better solution: https://github.com/mono/SkiaSharp/pull/1832
+        //TODO: Better solution: https://github.com/mono/SkiaSharp/pull/1832 & https://github.com/mono/SkiaSharp/pull/1912
         var dpiFi = typeof(SKCanvasView).GetField("dpi", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        var sizeFi = typeof(SKCanvasView).GetField("canvasSize", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
         var dpi = (double)dpiFi.GetValue(_canvasView);
+        _canvasSize = (SKSize)sizeFi.GetValue(_canvasView);
         SKRenderContext.DpiScale = (float)dpi;
         return new OxyRect(0, 0, (int)(_canvasSize.Width), (int)(_canvasSize.Height));
     }
@@ -205,19 +205,7 @@ public class PlotView : ComponentBase, IPlotView
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        _renderContext = CreateRenderContext();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender) return;
-        sizeWatcher = await SizeWatcherInterop.ImportAsync(JS, _wrapper, OnSizeChanged);
-    }
-
-    private void OnSizeChanged(SKSize size)
-    {
-        _canvasSize = size;
-        StateHasChanged();
+        _renderContext = new SkiaRenderContext();
     }
 
     /// <summary>
@@ -238,17 +226,18 @@ public class PlotView : ComponentBase, IPlotView
         AddEventCallback<MouseEventArgs>(builder, 3, "onmouseup", e => ActualController.HandleMouseUp(this, e.OxyMouseEventArgs()));
         AddEventCallback<MouseEventArgs>(builder, 3, "onmousein", e => ActualController.HandleMouseEnter(this, e.OxyMouseEventArgs()));
         AddEventCallback<MouseEventArgs>(builder, 3, "onmouseout", e => ActualController.HandleMouseLeave(this, e.OxyMouseEventArgs()));
+        AddEventCallback<MouseEventArgs>(builder, 3, "oncontextmenu", e => ActualController.HandleMouseDown(this, e.OxyMouseEventArgs()));
 
-        builder.AddAttribute(4, "onmousewheel", EventCallback.Factory.Create<WheelEventArgs>(this, e => ActualController.HandleMouseWheel(this, e.OxyMouseWheelEventArgs())));
-        //builder.AddEventPreventDefaultAttribute(6, "onmousewheel", true);
+        builder.AddAttribute(4, "onmousewheel", EventCallback.Factory.Create<WheelEventArgs>(this,
+            e => ActualController.HandleMouseWheel(this, e.OxyMouseWheelEventArgs())));
+
+        builder.AddEventPreventDefaultAttribute(6, "onmousewheel", true);
         builder.AddEventStopPropagationAttribute(4, "onmousewheel", true);
-
         builder.AddEventPreventDefaultAttribute(4, "oncontextmenu", true);
         builder.AddEventStopPropagationAttribute(4, "oncontextmenu", true);
 
         builder.AddComponentReferenceCapture(6, reference => _canvasView = (SKCanvasView)reference);
         builder.CloseComponent();
-        builder.AddElementReferenceCapture(6, reference => _wrapper = reference);
 
         if (_lastTrackerHitResult != null)
         {
@@ -258,7 +247,7 @@ public class PlotView : ComponentBase, IPlotView
             builder.AddContent(8, (MarkupString)_lastTrackerHitResult.Text);
             builder.CloseElement();
         }
-        if(zoomRectangle.Width > 0 && zoomRectangle.Height > 0)
+        if (zoomRectangle.Width > 0 && zoomRectangle.Height > 0)
         {
             builder.OpenElement(9, "div");
             builder.AddAttribute(9, "class", "oxyZoomRectangle");

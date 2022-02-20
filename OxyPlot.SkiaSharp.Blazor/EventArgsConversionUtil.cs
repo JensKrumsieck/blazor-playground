@@ -31,7 +31,7 @@ public static class EventArgsConversionUtil
     internal static OxyMouseWheelEventArgs OxyMouseWheelEventArgs(this WheelEventArgs args) => new()
     {
         Position = new ScreenPoint(args.OffsetX, args.OffsetY),
-        Delta = (int)(args.DeltaY != 0 ? args.DeltaY : args.DeltaX),
+        Delta = (int)(args.DeltaY != 0 ? -args.DeltaY : args.DeltaX),
         ModifierKeys = OxyModifierKeys(args)
     };
 }
