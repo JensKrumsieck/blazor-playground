@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
-<Import Project="..\OxyPlot.SkiaSharp.Blazor\build\net6.0\OxyPlot.SkiaSharp.Blazor.props" />
   <PropertyGroup>
 	  <PackageId>BlazorPlayground</PackageId>
        <TargetFramework>net6.0</TargetFramework>
@@ -8,12 +7,10 @@
 	  <LangVersion>10</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ChemSharp.Molecules.Blazor" Version="1.0.15" />
+	  <PackageReference Include="ChemSharp.Molecules.Blazor" Version="1.0.15" />
+	  <PackageReference Include="OxyPlot.SkiaSharp.Blazor" Version="1.0.0-beta.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.1" PrivateAssets="all" />    
   </ItemGroup>
 	
-  <ItemGroup>
-    <ProjectReference Include="..\OxyPlot.SkiaSharp.Blazor\OxyPlot.SkiaSharp.Blazor.csproj" />
-  </ItemGroup>
 </Project>
