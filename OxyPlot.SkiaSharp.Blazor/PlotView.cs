@@ -15,7 +15,7 @@ public class PlotView : ComponentBase, IPlotView
     protected IRenderContext _renderContext;
     private SkiaRenderContext SKRenderContext => (SkiaRenderContext)_renderContext;
     private SKCanvasView _canvasView;
-    private SKSize _canvasSize;
+    private string _cursor = "default";
     private TrackerHitResult _lastTrackerHitResult;
     private OxyRect zoomRectangle;
 
@@ -85,7 +85,7 @@ public class PlotView : ComponentBase, IPlotView
     /// <inheritdoc/>
     public void SetClipboardText(string text) { }
     /// <inheritdoc/>
-    public void SetCursorType(CursorType cursorType) { }
+    public void SetCursorType(CursorType cursorType) => _cursor = EventArgsConversionUtil.TranslateCursorType(cursorType);
 
     #region Controls
     /// <summary>
@@ -178,9 +178,9 @@ public class PlotView : ComponentBase, IPlotView
         var dpiFi = typeof(SKCanvasView).GetField("dpi", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
         var sizeFi = typeof(SKCanvasView).GetField("canvasSize", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
         var dpi = (double)dpiFi.GetValue(_canvasView);
-        _canvasSize = (SKSize)sizeFi.GetValue(_canvasView);
+        var size = (SKSize)sizeFi.GetValue(_canvasView);
         SKRenderContext.DpiScale = (float)dpi;
-        return new OxyRect(0, 0, (int)(_canvasSize.Width), (int)(_canvasSize.Height));
+        return new OxyRect(0, 0, (int)(size.Width), (int)(size.Height));
     }
     protected void ClearBackground()
     {
@@ -220,21 +220,14 @@ public class PlotView : ComponentBase, IPlotView
         builder.AddAttribute(1, "style", $"position: relative; {(UnmatchedParameters.ContainsKey("style") ? UnmatchedParameters["style"] : "")}");
         builder.OpenComponent<SKCanvasView>(1);
         builder.AddAttribute(2, "OnPaintSurface", OnPaintSurface);
-        builder.AddAttribute(2, "style", "width: 100%; height: inherit;"); //do not override!
+        builder.AddAttribute(2, "style", $"width: 100%; height: inherit; cursor: {_cursor}"); //do not override!
         AddEventCallback<MouseEventArgs>(builder, 3, "onmousedown", e => ActualController.HandleMouseDown(this, e.OxyMouseEventArgs()));
         AddEventCallback<MouseEventArgs>(builder, 3, "onmousemove", e => ActualController.HandleMouseMove(this, e.OxyMouseEventArgs()));
         AddEventCallback<MouseEventArgs>(builder, 3, "onmouseup", e => ActualController.HandleMouseUp(this, e.OxyMouseEventArgs()));
         AddEventCallback<MouseEventArgs>(builder, 3, "onmousein", e => ActualController.HandleMouseEnter(this, e.OxyMouseEventArgs()));
         AddEventCallback<MouseEventArgs>(builder, 3, "onmouseout", e => ActualController.HandleMouseLeave(this, e.OxyMouseEventArgs()));
         AddEventCallback<MouseEventArgs>(builder, 3, "oncontextmenu", e => ActualController.HandleMouseDown(this, e.OxyMouseEventArgs()));
-
-        builder.AddAttribute(4, "onmousewheel", EventCallback.Factory.Create<WheelEventArgs>(this,
-            e => ActualController.HandleMouseWheel(this, e.OxyMouseWheelEventArgs())));
-
-        builder.AddEventPreventDefaultAttribute(6, "onmousewheel", true);
-        builder.AddEventStopPropagationAttribute(4, "onmousewheel", true);
-        builder.AddEventPreventDefaultAttribute(4, "oncontextmenu", true);
-        builder.AddEventStopPropagationAttribute(4, "oncontextmenu", true);
+        AddEventCallback<WheelEventArgs>(builder, 3, "onmousewheel", e => ActualController.HandleMouseWheel(this, e.OxyMouseWheelEventArgs()));
 
         builder.AddComponentReferenceCapture(6, reference => _canvasView = (SKCanvasView)reference);
         builder.CloseComponent();

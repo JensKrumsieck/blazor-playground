@@ -17,6 +17,16 @@ public static class EventArgsConversionUtil
         _ => OxyPlot.OxyMouseButton.None
     };
 
+    internal static string TranslateCursorType(CursorType cursorType) => cursorType switch
+    {
+        CursorType.Pan => "grabbing",
+        CursorType.ZoomRectangle => "zoom-in",
+        CursorType.ZoomHorizontal => "col-resize",
+        CursorType.ZoomVertical => "row-resize",
+        CursorType.Default => "default",
+        _ => "default",
+    };
+
     internal static OxyModifierKeys OxyModifierKeys(this MouseEventArgs args)
     {
         var result = OxyPlot.OxyModifierKeys.None;
