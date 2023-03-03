@@ -32,7 +32,7 @@
 
     internal async Task<DataPoint[]> GenerateData()
     {
-        var bytes = await http.GetByteArrayAsync("https://github.com/JensKrumsieck/ChemSharp/blob/master/Tests/ChemSharp.Tests/files/uvvis.dsw");
+        var bytes = await http.GetByteArrayAsync("https://github.com/JensKrumsieck/ChemSharp/blob/master/Tests/ChemSharp.Spectroscopy.Tests/files/uvvis.DSW");
         var byteOffset = 0x459;
         var cutOffLength = BitConverter.ToInt32(bytes, 0x6d) * 8;
         bytes = new ArraySegment<byte>(bytes, byteOffset,
